@@ -23,13 +23,13 @@ public class UserController {
         return ResponseEntity.ok("OK");
     }
 
-    @PostMapping("add_user")
+    @PostMapping("/add_user")
     public ResponseEntity<String> create(@RequestBody User user) {
         service.createUser(user);
         return ResponseEntity.ok("User created");
     }
 
-    @GetMapping("get_user")
+    @GetMapping("/get_user")
     public List<User> getAll() {
         return service.getUsers();
     }

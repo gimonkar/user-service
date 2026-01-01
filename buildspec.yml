@@ -16,15 +16,14 @@ phases:
       - echo Installing Maven...
       - mvn -version
 
-  pre_build:
-    commands:
-      - echo Building Spring Boot JAR...
-      - mvn clean package -DskipTests
+pre_build:
+  commands:
+    - echo Building Spring Boot JAR...
+    - mvn clean package -DskipTests
 
-      - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region $AWS_REGION |
-        docker login --username AWS --password-stdin \
-        $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+    - echo Logging in to Amazon ECR...
+    - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
 
   build:
     commands:
@@ -33,17 +32,14 @@ phases:
       - docker tag $ECR_REPO:$IMAGE_TAG \
         $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
 
-  post_build:
-    commands:
-      - echo Pushing image to ECR...
-      - docker push \
-        $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+post_build:
+  commands:
+    - echo Pushing image to ECR...
+    - docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
 
-      - echo Writing imagedefinitions.json...
-      - printf '[{"name":"%s","imageUri":"%s"}]' \
-        "$CONTAINER_NAME" \
-        "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG" \
-        > imagedefinitions.json
+    - echo Writing imagedefinitions.json...
+    - printf '[{"name":"%s","imageUri":"%s"}]' "$CONTAINER_NAME" "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG" > imagedefinitions.json
+
 
 artifacts:
   files:

@@ -18,6 +18,11 @@ public class UserController {
         this.service = service;
     }
 
+    @GetMapping
+    public ResponseEntity<String> baseHealth() {
+        return ResponseEntity.ok("OK");
+    }
+
     @PostMapping("add_user")
     public ResponseEntity<String> create(@RequestBody User user) {
         service.createUser(user);

@@ -37,8 +37,5 @@ phases:
       - docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
 
       - echo Updating SSM parameter...
-      - aws ssm put-parameter \
-        --name $SSM_IMAGE_PARAM \
-        --type String \
-        --value $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG \
-        --overwrite
+      - aws ssm put-parameter --name "$SSM_IMAGE_PARAM" --type String --value "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG" --overwrite
+

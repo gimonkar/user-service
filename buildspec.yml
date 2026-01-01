@@ -38,7 +38,11 @@ post_build:
     - docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
 
     - echo Writing imagedefinitions.json...
-    - printf '[{"name":"%s","imageUri":"%s"}]' "$CONTAINER_NAME" "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG" > imagedefinitions.json
+    - pwd
+    - ls -la
+    - echo '[{"name":"'"$CONTAINER_NAME"'","imageUri":"'"$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG"'"}]' > imagedefinitions.json
+    - ls -la
+    - cat imagedefinitions.json
 
 
 artifacts:

@@ -13,15 +13,13 @@ phases:
     runtime-versions:
       java: corretto21
     commands:
-      - echo Installing Maven
+      - echo Checking Maven
       - mvn -version
 
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region $AWS_REGION |
-        docker login --username AWS --password-stdin \
-        $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
   build:
     commands:
@@ -31,14 +29,12 @@ phases:
       - echo Building Docker image...
       - docker build -t $ECR_REPO:$IMAGE_TAG .
 
-      - docker tag $ECR_REPO:$IMAGE_TAG \
-        $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+      - docker tag $ECR_REPO:$IMAGE_TAG $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
 
   post_build:
     commands:
       - echo Pushing image to ECR...
-      - docker push \
-        $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+      - docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
 
       - echo Updating SSM parameter...
       - aws ssm put-parameter \

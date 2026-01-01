@@ -6,25 +6,39 @@ env:
     ACCOUNT_ID: 300823008514
     ECR_REPO: user-service
     IMAGE_TAG: latest
-    CONTAINER_NAME: user-service   # must match ECS task definition container name
+    CONTAINER_NAME: user-service
 
 phases:
+  install:
+    runtime-versions:
+      java: corretto21
+    commands:
+      - echo Installing Maven...
+      - mvn -version
+
   pre_build:
     commands:
+      - echo Building Spring Boot JAR...
+      - mvn clean package -DskipTests
+
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_REGION |
-        docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+        docker login --username AWS --password-stdin \
+        $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
   build:
     commands:
       - echo Building Docker image...
       - docker build -t $ECR_REPO:$IMAGE_TAG .
-      - docker tag $ECR_REPO:$IMAGE_TAG $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+      - docker tag $ECR_REPO:$IMAGE_TAG \
+        $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
 
   post_build:
     commands:
       - echo Pushing image to ECR...
-      - docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+      - docker push \
+        $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+
       - echo Writing imagedefinitions.json...
       - printf '[{"name":"%s","imageUri":"%s"}]' \
         "$CONTAINER_NAME" \
